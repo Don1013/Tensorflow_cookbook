@@ -20,14 +20,17 @@ A = tf.Variable(tf.random.normal(shape=[1, 1]))
 b = tf.Variable(tf.random.normal(shape=[1, 1]))
 
 # set L2 loss function
+@tf.function
 def loss(x_data, y_target):
   model_output = tf.add(tf.matmul(x_data, A), b)
   return tf.math.reduce_mean(tf.square(y_target - model_output))
 
+
 # set optimizer
-my_opt = tf.keras.optimizers.SGD(learning_rate)
-def train_step(x_data, y_target):
-  return my_opt.minimize(loss(x_data, y_target), var_list=[A, b])
+@tf.function
+def train_step(x_data, y_taeget):
+  my_opt = tf.compat.v1.train.GradientDescentOptimizer(learning_rate)
+  my_opt.minimize(loss(x_data, y_target), var_list=[A, b])
 
 loss_vec = []
 for i in range(100):
@@ -37,10 +40,10 @@ for i in range(100):
   x_data = tf.convert_to_tensor(rand_x, dtype='float32')
   y_target = tf.convert_to_tensor(rand_y, dtype='float32')
   train_step(x_data, y_target)
-  temp_loss = loss(tf.convert_to_tensor(rand_x, dtype='float32'), tf.convert_to_tensor(rand_y, dtype='float32'))
+  temp_loss = loss(x_data, y_target)
   loss_vec.append(temp_loss)
   if (i + 1) % 25 == 0:
-    print('Step #' + str(i + 1) + 'A = ' + str(A.numpy())) + 'b = ' + str(b.numpy())
+    print('Step #' + str(i + 1) + ' A = ' + str(A.numpy()) + ' b = ' + str(b.numpy()))
     print('Loss = ' + str(temp_loss.numpy()))
 
 # extract coefficients
@@ -54,7 +57,7 @@ for i in x_vals:
   
 # make graph
 #1st graph
-plt.plot(x_vals, y_vals, 'o', laabel='Data Points')
+plt.plot(x_vals, y_vals, 'o', label='Data Points')
 plt.plot(x_vals, best_fit, 'r-', label='Best fit line', linewidth=3)
 plt.legend(loc='upper left')
 plt.title('Sepal Length vs Petal Width')
