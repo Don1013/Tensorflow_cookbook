@@ -25,7 +25,6 @@ def loss(x_data, y_target):
   model_output = tf.add(tf.matmul(x_data, A), b)
   return tf.math.reduce_mean(tf.square(y_target - model_output))
 
-
 # set optimizer
 @tf.function
 def train_step(x_data, y_taeget):
